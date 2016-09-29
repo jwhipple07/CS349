@@ -26,7 +26,7 @@ public class PhotoViewerLayout extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 8973438971186075837L;
-	private static final String serializedFilePath = "C:/CS349/photoViewer.ser";
+	private static final String serializedFilePath = System.getProperty("user.dir") + "\\src\\photoViewer.ser";
 
 	private photoAlbum album;
 
