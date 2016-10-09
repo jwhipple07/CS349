@@ -9,6 +9,9 @@ public class AccountManager {
 		if(to == from){
 			return true;
 		}
+		if(amount < 0){
+			return false;
+		}
 		if(getRowByValue(table, to) == -1 || getRowByValue(table, from) == -1){
 			return false;
 		}
