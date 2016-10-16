@@ -104,7 +104,11 @@ public class PhotoViewer extends PhotoViewerLayout {
 						id = order.get(index);
 					}
 					photo = DB.getPhoto(id);
-					showPicture(photo);
+					SwingUtilities.invokeLater(new Runnable(){
+						public void run(){
+							showPicture(photo);						
+						}
+					});
 				} else {
 					JOptionPane.showMessageDialog(null, "There was an error deleting this photo.");
 				}
