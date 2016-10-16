@@ -1,49 +1,29 @@
 package photoViewer;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Vector;
-
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 public class PhotoViewerLayout extends JFrame {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 8973438971186075837L;
-	private static final String serializedFilePath = System.getProperty("user.dir") + "\\src\\photoViewer.ser";
+	protected JTextArea descriptionTextArea;
+	protected JTextField dateTextField;
+	protected JLabel imageLabel;
+	protected JLabel pictureCountLabel;
+	protected JComboBox<Integer> pictureNumberCombobox;
+	protected JButton prevButton;
+	protected JButton nextButton;
+	protected JButton delete;
+	protected JButton save;
+	protected JButton add;
+	protected JPanel buttonPane;
+	protected JMenuItem browse;
+	protected JMenuItem maintainMenu;
+	protected JMenuItem close;
 
-	private photoAlbum album;
-
-	private JTextArea descriptionTextArea;
-	private JTextField dateTextField;
-	private JLabel imageLabel;
-	private JLabel pictureCountLabel;
-	private JComboBox<Integer> pictureNumberCombobox;
-	private JButton prevButton;
-	private JButton nextButton;
-	private JButton delete;
-	private JButton save;
-	private JButton add;
-	private JPanel buttonPane;
-
-	public PhotoViewerLayout() {
-		loadAlbum();
+	public PhotoViewerLayout(String name) {
+		super(name);
+		
 		Container contentPane = getContentPane();
 
 		contentPane.add(createMenuBar(), BorderLayout.NORTH);
@@ -51,7 +31,7 @@ public class PhotoViewerLayout extends JFrame {
 		imageLabel = new JLabel("", SwingConstants.CENTER);
 		JScrollPane scrollPane = new JScrollPane(imageLabel);
 		scrollPane.setPreferredSize(new Dimension(700, 500));
-		ImageIcon image = new ImageIcon();
+		ImageIcon image = new ImageIcon(System.getProperty("user.dir") + "\\src\\photoViewer\\loadingTwo.gif");
 		imageLabel.setIcon(image);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
@@ -81,6 +61,7 @@ public class PhotoViewerLayout extends JFrame {
 		buttonPane = new JPanel();
 		delete = new JButton("Delete");
 		save = new JButton("Save Changes");
+		save.setVisible(false);
 		add = new JButton("Add Photo");
 
 		buttonPane.add(save);
@@ -111,174 +92,18 @@ public class PhotoViewerLayout extends JFrame {
 		controlPane.add(southButtonPanel);
 
 		contentPane.add(controlPane, BorderLayout.SOUTH); 
-		updatePanels();
-		addActionListeners();
 	}
-
-	public static void main(String[] args) {
-		JFrame frame = new PhotoViewerLayout();
-		frame.pack();
-		frame.setMinimumSize(new Dimension(750, 750));
-		frame.setVisible(true);
-	}
-
-	class showSave implements DocumentListener {
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			showSaveButton();
-		}
-
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-			showSaveButton();
-		}
-
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-			showSaveButton();
-		}
-	}
-
-	public void addActionListeners() {
-		descriptionTextArea.getDocument().addDocumentListener(new showSave());
-		dateTextField.getDocument().addDocumentListener(new showSave());
-
-		nextButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				album.nextPhoto();
-				updatePanels();
-			}
-
-		});
-		prevButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				album.prevPhoto();
-				updatePanels();
-			}
-
-		});
-		pictureNumberCombobox.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				if (event.getStateChange() == ItemEvent.SELECTED) {
-					Object item = event.getItem();
-					album.photoNum = Integer.parseInt(item.toString());
-					album.setCurrentPhoto();
-					updatePanels();
-				}
-			}
-
-		});
-		delete.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				if (album.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "There is nothing to delete.");
-					return;
-				}
-				int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to delete this photo?", "Warning",
-						JOptionPane.YES_NO_OPTION);
-				if (dialogResult == JOptionPane.YES_OPTION) {
-					album.deletePhoto();
-					updatePanels();
-				}
-			}
-
-		});
-		add.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser();
-				int returnValue = fileChooser.showOpenDialog(null);
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = fileChooser.getSelectedFile();
-					Photo newPhoto = new Photo();
-					newPhoto.image = new ImageIcon(selectedFile.getAbsolutePath());
-					String temp = newPhoto.image.getDescription();
-					newPhoto.description = temp.substring(temp.lastIndexOf("\\") + 1, temp.lastIndexOf("."));
-					album.addPhoto(newPhoto);
-					updatePanels();
-				}
-
-			}
-
-		});
-		save.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (album.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "There is nothing to save.");
-					return;
-				}
-				//validate date
-				if(album.getCurrentPhoto().validateDate(dateTextField.getText())){
-					dateTextField.setText(album.getCurrentPhoto().dateText);
-					album.getCurrentPhoto().description = descriptionTextArea.getText();
-					album.getCurrentPhoto().index = album.getIndex();
-					save.setVisible(false);
-				} else {
-					JOptionPane.showMessageDialog(null, "Invalid date Format. Expecting MM/dd/yyyy.");
-				}
-			}
-
-		});
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				exit();
-			}
-		});
-	}
+	
 
 	public JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("File");
-		JMenuItem close = new JMenuItem("Close");
-		close.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				exit();
-			}
-
-		});
-
+		close = new JMenuItem("Close");
 		JMenu view = new JMenu("View");
-		JMenuItem browse = new JMenuItem("Browse");
-
-		JMenuItem maintainMenu = new JMenuItem("Maintain");
+		browse = new JMenuItem("Browse");
+		maintainMenu = new JMenuItem("Maintain");
 		browse.setEnabled(false); //default to not enabled
-		browse.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				browse.setEnabled(false);
-				maintainMenu.setEnabled(true);
-				buttonPane.setVisible(false);
-				descriptionTextArea.setEditable(false);
-				descriptionTextArea.setOpaque(false);
-				dateTextField.setEditable(false);
-			}
-
-		});
-		maintainMenu.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				browse.setEnabled(true);
-				maintainMenu.setEnabled(false);
-				buttonPane.setVisible(true);
-				descriptionTextArea.setEditable(true);
-				descriptionTextArea.setOpaque(true);
-				dateTextField.setEditable(true);
-			}
-
-		});
+		
 		menu.add(close);
 		view.add(browse);
 		view.add(maintainMenu);
@@ -287,84 +112,5 @@ public class PhotoViewerLayout extends JFrame {
 		return menuBar;
 	}
 
-	public void exit() {
-		try {
-			FileOutputStream fileOut = new FileOutputStream(serializedFilePath);
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(album);
-			out.close();
-			fileOut.close();
-			System.out.printf("Serialized data is saved in: " + serializedFilePath);
-		} catch (IOException i) {
-			i.printStackTrace();
-		}
-
-		System.exit(0);
-	}
-
-	public void loadAlbum() {
-		album = new photoAlbum();
-		try {
-			FileInputStream fileIn = new FileInputStream(serializedFilePath);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			album = (photoAlbum) in.readObject();
-			in.close();
-			fileIn.close();
-		} catch (FileNotFoundException e) {
-			album = new photoAlbum();
-			return;
-		} catch (IOException i) {
-			i.printStackTrace();
-			return;
-		} catch (ClassNotFoundException c) {
-			System.out.println("Photo Album class not found");
-			c.printStackTrace();
-			return;
-		}
-	}
-
-	public void showSaveButton() {
-		save.setVisible(true);
-	}
-
-	public void updatePanels() {
-		Photo picture;
-		if (album == null || album.getTotalSize() == 0) {
-			picture = new Photo();
-		} else {
-			picture = album.getCurrentPhoto();
-		}
-		Vector<Integer> numList = new Vector<Integer>();
-		for (int i = 1; i <= album.getTotalSize(); i++) {
-			numList.add(i);
-		}
-		if (numList.size() != pictureNumberCombobox.getItemCount()) {
-			pictureNumberCombobox.setModel(new DefaultComboBoxModel<Integer>(numList));
-
-			pictureCountLabel.setText(" of " + album.getTotalSize());
-		}
-		if (album.photoNum > 0) {
-			pictureNumberCombobox.setSelectedIndex(album.photoNum - 1);
-		}
-		imageLabel.setIcon(new ImageIcon(picture.image.getImage().getScaledInstance(700, 500, Image.SCALE_DEFAULT)));
-		dateTextField.setText(picture.dateText);
-		descriptionTextArea.setText(picture.description);
-
-		if (album.isEmpty() || album.getTotalSize() == 1) {
-			prevButton.setEnabled(false);
-			nextButton.setEnabled(false);
-		} else if (album.photoNum == 1) {
-			prevButton.setEnabled(false);
-			nextButton.setEnabled(true);
-		} else if (album.photoNum.equals(album.getTotalSize())) {
-			prevButton.setEnabled(true);
-			nextButton.setEnabled(false);
-		} else {
-			prevButton.setEnabled(true);
-			nextButton.setEnabled(true);
-
-		}
-		save.setVisible(false);
-	}
 
 }
