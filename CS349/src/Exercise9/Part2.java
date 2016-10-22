@@ -4,6 +4,7 @@ public class Part2 {
 	private static int x, y, z;
 
 	public static void main(String[] args) {
+		long startTime = System.nanoTime();
 		Thread t1 = new MyThreadUnSync();
 		Thread t2 = new MyThreadUnSync();
 		t1.start();
@@ -14,6 +15,9 @@ public class Part2 {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		printValues();
+		long endTime = System.nanoTime();
+		System.out.println("Computation took " + ((endTime - startTime) / 1000000) + " milliseconds");
 	}
 
 	public static void f() {
@@ -30,12 +34,8 @@ public class Part2 {
 }
 class MyThreadUnSync extends Thread{
 	public void run() {
-		long startTime = System.nanoTime();
 		for (int i = 0; i < 100000000; i++) {
 			Part2.f();
 		}
-		Part2.printValues();
-		long endTime = System.nanoTime();
-		System.out.println("Computation took " + ((endTime - startTime) / 1000000) + " milliseconds");
 	}
 }
