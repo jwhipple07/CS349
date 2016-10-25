@@ -6,7 +6,7 @@ import acme.NetworkService;
 
 /**
  * Run the unaltered program, to show that it errors.
- * Then search for the field names and will use that in Part2.
+ * Then search for the field names and will use that in Part1A.
  * 
  * @author Jonathan Whipple
  *
