@@ -2,11 +2,8 @@ package exercise14;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingDouble;
 import java.io.IOException;
