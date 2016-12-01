@@ -12,36 +12,37 @@ import java.nio.file.Files;
 public class FunctionalProgramming {
 	public static void main(String[] args) throws IOException {
 		Path path = Paths.get("Movie-Data.txt");
-
-//#1
-		System.out.print("Top Grossing movie: ");
-		//Prints the line that made the highest revenue
-		Files.lines(path)
-				.max((v1, v2) -> Double.compare(getRevenue(v1), getRevenue(v2)))
-				.ifPresent((line) -> System.out.println(line));
-
-		System.out.println("");
-
-//#2
-		//get total revenues for each decade
-		Map<Integer, Double> decadeRevenue = Files.lines(path)
-				.collect(
-						groupingBy(FunctionalProgramming::getDecade, 
-								summingDouble(FunctionalProgramming::getRevenue)));
-		String seventies = "1970 with $" + decadeRevenue.get(1970);
-		String eighties = "1980 with $" + decadeRevenue.get(1980);
-		String topGross = decadeRevenue.get(1970) > decadeRevenue.get(1980) ? seventies : eighties;
-		System.out.println("Decade with most revenue between 70s and 80s is: " + topGross);
-
-
-//#3		
-		// Prints all titles and their revenues over $500 mil
-		Files.lines(path)
-				.filter((row) -> getRevenue(row) > 500.0)
-				.sorted()
-				.forEach((line) -> System.out.println(line));
-
-		System.out.println("");
+//
+////#1
+//		System.out.print("Top Grossing movie: ");
+//		//Prints the line that made the highest revenue
+//		Files.lines(path)
+//				.max((v1, v2) -> Double.compare(getRevenue(v1), getRevenue(v2)))
+//				.ifPresent((line) -> System.out.println(line));
+//
+//		System.out.println("");
+//
+////#2
+//		//get total revenues for each decade
+//		Map<Integer, Double> decadeRevenue = Files.lines(path)
+//				.collect(
+//						groupingBy(FunctionalProgramming::getDecade, 
+//								summingDouble(FunctionalProgramming::getRevenue)));
+//		String seventies = "1970 with $" + decadeRevenue.get(1970);
+//		String eighties = "1980 with $" + decadeRevenue.get(1980);
+//		String topGross = decadeRevenue.get(1970) > decadeRevenue.get(1980) ? seventies : eighties;
+//		System.out.println("Decade with most revenue between 70s and 80s is: " + topGross);
+//
+//		System.out.println("");
+//
+////#3		
+//		// Prints all titles and their revenues over $500 mil
+//		Files.lines(path)
+//				.filter((row) -> getRevenue(row) > 500.0)
+//				.sorted()
+//				.forEach((line) -> System.out.println(line));
+//
+//		System.out.println("");
 		
 //#4 (EXTRA CREDIT)
 		//get the max revenue by studio in 1960s
