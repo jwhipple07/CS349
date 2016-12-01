@@ -15,6 +15,7 @@ public class FunctionalProgramming {
 
 //#1
 		System.out.print("Top Grossing movie: ");
+		
 		//Prints the line that made the highest revenue
 		Files.lines(path)
 				.max((v1, v2) -> Double.compare(getRevenue(v1), getRevenue(v2)))
